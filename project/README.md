@@ -1,18 +1,32 @@
-# E-Commerce Recommendation Scoring API (Supervised Learning)
+# E-Commerce Recommendation Scoring API
 
-Project ini membangun sistem rekomendasi produk e-commerce berbasis **supervised learning regresi** untuk memprediksi probabilitas `0-1`:
+Dokumentasi ini ditulis untuk pemula, dari nol sampai project bisa jalan end-to-end.
 
-`Probability for the product to be recommended to the person`
+Project ini memprediksi:
+- `Probability for the product to be recommended to the person` (nilai 0 sampai 1)
 
-## Problem Framing
+## 1. Apa Masalah Yang Diselesaikan
 
-Kasus ini adalah **recommendation scoring problem**, bukan collaborative filtering klasik, karena:
+Ini adalah **supervised learning regression** untuk recommendation scoring.
 
-- Label target sudah tersedia sebagai probabilitas rekomendasi.
-- Prediksi dilakukan dari kombinasi fitur user behavior, produk, dan konteks (musim, lokasi, holiday).
-- Output model adalah skor probabilitas untuk ranking/keputusan rekomendasi.
+Kenapa bukan collaborative filtering klasik:
+1. Kita punya label target langsung (probabilitas rekomendasi).
+2. Prediksi dibuat dari fitur behavior user, fitur produk, dan konteks.
+3. Output model adalah skor probabilitas yang bisa dipakai untuk keputusan rekomendasi.
 
-## Struktur Project
+## 2. Arsitektur End-to-End
+
+Alur project:
+1. `train.py` membaca dataset CSV.
+2. Nama kolom dibersihkan ke `snake_case`.
+3. Data dipisah train/test.
+4. Preprocessing numerik + kategorikal dijalankan lewat `ColumnTransformer`.
+5. Beberapa model baseline dilatih dan dibandingkan.
+6. Model terbaik dipilih berdasarkan RMSE.
+7. Artifact disimpan ke `models/`.
+8. `app.py` memuat model dan menyajikan endpoint prediksi.
+
+## 3. Struktur Folder
 
 ```text
 project/
@@ -26,14 +40,44 @@ project/
 ├── models/
 │   ├── best_model.joblib
 │   └── model_metadata.json
-└── data/
-    └── content_based_recommendation_dataset.csv
+├── data/
+│   └── content_based_recommendation_dataset.csv
+└── notebooks/
+    └── optional_eda.ipynb
 ```
 
-## Mapping Nama Kolom (Original -> Snake Case)
+## 4. Penjelasan Setiap File
 
-Mapping ini dipakai otomatis saat training dan disimpan ke metadata.
+1. `config.py`
+Berisi konfigurasi path, mapping kolom, daftar fitur numerik/kategorikal, random state, threshold label rekomendasi.
 
+2. `utils.py`
+Berisi fungsi reusable:
+- load dan validasi dataset
+- build preprocessor
+- training multi model
+- evaluasi metrik
+- simpan/load model
+- validasi input API single dan batch
+
+3. `train.py`
+Entrypoint training model. Script ini menjalankan training end-to-end dan menyimpan artifact.
+
+4. `app.py`
+Flask API server dengan endpoint health, train, predict single, predict batch.
+
+5. `predict_example.py`
+Contoh client sederhana untuk memanggil endpoint `/predict`.
+
+6. `notebooks/optional_eda.ipynb`
+Notebook belajar yang menjelaskan statistik preprocessing hingga hasil model.
+
+## 5. Dataset dan Mapping Kolom
+
+Kolom target:
+- `Probability for the product to be recommended to the person`
+
+Kolom API memakai format `snake_case`. Mapping utama:
 1. `Number of clicks on similar products` -> `number_of_clicks_on_similar_products`
 2. `Number of similar products purchased so far` -> `number_of_similar_products_purchased_so_far`
 3. `Average rating given to similar products` -> `average_rating_given_to_similar_products`
@@ -48,86 +92,117 @@ Mapping ini dipakai otomatis saat training dan disimpan ke metadata.
 12. `Geographical locations` -> `geographical_locations`
 13. `Probability for the product to be recommended to the person` -> `probability_for_the_product_to_be_recommended_to_the_person`
 
-## Fitur Utama
+## 6. Setup Dari Nol
 
-- Validasi dataset dan exploratory checks singkat (shape, missing value, statistik target).
-- Preprocessing numerik dan kategorikal dengan `ColumnTransformer`.
-- Baseline model:
-  - `LinearRegression`
-  - `RandomForestRegressor`
-  - `GradientBoostingRegressor`
-  - `XGBRegressor` otomatis ditambahkan jika `xgboost` terpasang.
-- Evaluasi model dengan:
-  - MAE
-  - RMSE
-  - R2
-- Pemilihan model terbaik berdasarkan RMSE terendah.
-- Penyimpanan artifact:
-  - `models/best_model.joblib`
-  - `models/model_metadata.json`
-- Flask API:
-  - `GET /`
-  - `GET /health`
-  - `POST /train`
-  - `POST /predict`
-  - `POST /predict_batch`
+Jalankan dari folder `project`.
 
-## Instalasi
-
+1. Buat virtual environment:
 ```bash
-cd project
 python3 -m venv .venv
+```
+
+2. Aktifkan virtual environment:
+```bash
 source .venv/bin/activate
+```
+
+3. Install dependency:
+```bash
 pip install -r requirements.txt
 ```
 
-## Konfigurasi Git
+## 7. Konfigurasi Git
 
-File Git config yang sudah disiapkan:
+File Git sudah disiapkan di root repo:
+- `../.gitignore`
+- `../.gitattributes`
 
-- `.gitignore` di root repo (`Recommendation/.gitignore`)
-- `.gitattributes` di root repo (`Recommendation/.gitattributes`)
-
-Langkah setup Git (jalankan dari root repo `Recommendation/`):
-
+Konfigurasi dasar Git:
 ```bash
-# Isi identitas (sekali per machine atau gunakan --global)
 git config user.name "Nama Anda"
 git config user.email "email@anda.com"
-
-# Jika belum init repo
 git init
-
-# Gunakan branch utama
 git branch -M main
-
-# Commit awal
 git add .
 git commit -m "Initialize recommendation scoring project"
 ```
 
-## Training Model
+## 8. Training Model
 
+Perintah standar:
 ```bash
 python train.py
 ```
 
-Optional custom path:
-
+Perintah custom path:
 ```bash
-python train.py --data-path data/content_based_recommendation_dataset.csv --model-path models/best_model.joblib --metadata-path models/model_metadata.json
+python train.py \
+  --data-path data/content_based_recommendation_dataset.csv \
+  --model-path models/best_model.joblib \
+  --metadata-path models/model_metadata.json
 ```
 
-## Menjalankan Flask Server
+Output training:
+1. `models/best_model.joblib`
+2. `models/model_metadata.json`
 
+Metadata berisi:
+1. model terpilih
+2. metrik semua kandidat model
+3. feature columns
+4. target column
+5. mapping kolom
+6. timestamp training
+
+## 9. Preprocessing dan Modeling Yang Dipakai
+
+Preprocessing:
+1. Fitur numerik:
+- `SimpleImputer(strategy="median")`
+- `StandardScaler()`
+2. Fitur kategorikal:
+- `SimpleImputer(strategy="most_frequent")`
+- `OneHotEncoder(handle_unknown="ignore")`
+
+Model baseline:
+1. `LinearRegression`
+2. `RandomForestRegressor`
+3. `GradientBoostingRegressor`
+4. `XGBRegressor` opsional jika dependency ada
+
+Metrik evaluasi:
+1. MAE
+2. RMSE
+3. R2
+
+Kriteria model terbaik:
+1. RMSE paling kecil
+
+## 10. Menjalankan API
+
+Jalankan server:
 ```bash
 python app.py
 ```
 
-Server default: `http://127.0.0.1:5000`
+Base URL default:
+- `http://127.0.0.1:5000`
 
-## Contoh Request `POST /predict`
+Endpoint:
+1. `GET /`
+2. `GET /health`
+3. `POST /train`
+4. `POST /predict`
+5. `POST /predict_batch`
 
+Catatan:
+1. Jika model belum tersedia, endpoint prediksi mengembalikan HTTP `503`.
+2. Input validation error mengembalikan HTTP `400`.
+3. Kategori baru tidak membuat crash karena `handle_unknown="ignore"`.
+
+## 11. Contoh Request API
+
+Contoh `POST /predict`:
 ```bash
 curl -X POST "http://127.0.0.1:5000/predict" \
   -H "Content-Type: application/json" \
@@ -148,21 +223,18 @@ curl -X POST "http://127.0.0.1:5000/predict" \
 ```
 
 Contoh response:
-
 ```json
 {
-  "predicted_probability": 0.812345,
+  "predicted_probability": 0.871233,
   "recommendation_label": "recommended"
 }
 ```
 
 Rule label:
+1. jika `predicted_probability >= 0.7` maka `recommended`
+2. jika `< 0.7` maka `not_recommended`
 
-- `predicted_probability >= 0.7` -> `recommended`
-- `< 0.7` -> `not_recommended`
-
-## Contoh Request `POST /predict_batch`
-
+Contoh `POST /predict_batch`:
 ```bash
 curl -X POST "http://127.0.0.1:5000/predict_batch" \
   -H "Content-Type: application/json" \
@@ -200,8 +272,40 @@ curl -X POST "http://127.0.0.1:5000/predict_batch" \
   }'
 ```
 
-## Catatan Produksi
+## 12. Menjalankan Notebook Belajar
 
-- Endpoint prediksi aman untuk kategori baru karena encoder menggunakan `handle_unknown="ignore"`.
-- Jika model belum dilatih, endpoint `/predict` dan `/predict_batch` mengembalikan HTTP `503` dengan pesan jelas.
-- Metadata training (`model_metadata.json`) berisi model terpilih, semua metrik kandidat, fitur, target, mapping kolom, dan timestamp training.
+Notebook untuk belajar detail preprocessing dan hasil model:
+- `notebooks/optional_eda.ipynb`
+
+Langkah menjalankan:
+1. Pastikan dependency sudah terinstall.
+2. Install jupyter jika belum ada:
+```bash
+pip install notebook
+```
+3. Jalankan:
+```bash
+jupyter notebook notebooks/optional_eda.ipynb
+```
+4. Jalankan cell dari atas ke bawah (`Run All`).
+
+## 13. Troubleshooting Cepat
+
+1. Error `Dataset tidak ditemukan`
+Periksa path file ada di `data/content_based_recommendation_dataset.csv`.
+
+2. Error endpoint predict `Model belum tersedia`
+Jalankan training dulu via `python train.py` atau `POST /train`.
+
+3. Error validasi input `Field wajib hilang`
+Pastikan semua field fitur dikirim lengkap dengan nama `snake_case`.
+
+4. Error `ModuleNotFoundError`
+Pastikan virtual environment aktif dan dependency terinstall.
+
+## 14. Roadmap Belajar Selanjutnya
+
+1. Tambahkan cross-validation.
+2. Lakukan hyperparameter tuning.
+3. Tambahkan monitoring performa model.
+4. Tambahkan test otomatis untuk endpoint API.
