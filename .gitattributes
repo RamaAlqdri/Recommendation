@@ -1,0 +1,6 @@
+* text=auto eol=lf
+
+# Keep model binaries treated as binary files
+*.joblib binary
+*.pkl binary
+*.onnx binary

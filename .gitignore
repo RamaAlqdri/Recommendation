@@ -1,0 +1,39 @@
+# macOS
+.DS_Store
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment and local settings
+.env
+.env.*
+.python-version
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Flask runtime
+instance/
+.flaskenv
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# ML artifacts (generated)
+project/models/best_model.joblib
+project/models/*.pkl
+project/models/*.onnx
+
