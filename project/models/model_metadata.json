@@ -1,0 +1,80 @@
+{
+  "selected_model": "RandomForestRegressor",
+  "selection_metric": "rmse",
+  "metrics": {
+    "LinearRegression": {
+      "mae": 0.07764758426657967,
+      "rmse": 0.10296156354145522,
+      "r2": 0.9103319811915734
+    },
+    "RandomForestRegressor": {
+      "mae": 0.024748474576271773,
+      "rmse": 0.04820428283087695,
+      "r2": 0.9803456553168695
+    },
+    "GradientBoostingRegressor": {
+      "mae": 0.03245882937029063,
+      "rmse": 0.054601277500593695,
+      "r2": 0.9747830286995036
+    }
+  },
+  "feature_columns": [
+    "number_of_clicks_on_similar_products",
+    "number_of_similar_products_purchased_so_far",
+    "average_rating_given_to_similar_products",
+    "gender",
+    "median_purchasing_price_in_rupees",
+    "rating_of_the_product",
+    "brand_of_the_product",
+    "customer_review_sentiment_score_overall",
+    "price_of_the_product",
+    "holiday",
+    "season",
+    "geographical_locations"
+  ],
+  "numeric_feature_columns": [
+    "number_of_clicks_on_similar_products",
+    "number_of_similar_products_purchased_so_far",
+    "average_rating_given_to_similar_products",
+    "median_purchasing_price_in_rupees",
+    "rating_of_the_product",
+    "customer_review_sentiment_score_overall",
+    "price_of_the_product"
+  ],
+  "categorical_feature_columns": [
+    "gender",
+    "brand_of_the_product",
+    "holiday",
+    "season",
+    "geographical_locations"
+  ],
+  "target_column": "probability_for_the_product_to_be_recommended_to_the_person",
+  "column_mapping": {
+    "Number of clicks on similar products": "number_of_clicks_on_similar_products",
+    "Number of similar products purchased so far": "number_of_similar_products_purchased_so_far",
+    "Average rating given to similar products": "average_rating_given_to_similar_products",
+    "Gender": "gender",
+    "Median purchasing price (in rupees)": "median_purchasing_price_in_rupees",
+    "Rating of the product": "rating_of_the_product",
+    "Brand of the product": "brand_of_the_product",
+    "Customer review sentiment score (overall)": "customer_review_sentiment_score_overall",
+    "Price of the product": "price_of_the_product",
+    "Holiday": "holiday",
+    "Season": "season",
+    "Geographical locations": "geographical_locations",
+    "Probability for the product to be recommended to the person": "probability_for_the_product_to_be_recommended_to_the_person"
+  },
+  "data_path": "/Users/ramadhanial-qadri/Documents/My_File/Machine Learning/Basic/Recommendation/project/data/content_based_recommendation_dataset.csv",
+  "model_path": "/Users/ramadhanial-qadri/Documents/My_File/Machine Learning/Basic/Recommendation/project/models/best_model.joblib",
+  "test_size": 0.2,
+  "random_state": 42,
+  "training_timestamp": "2026-03-10T02:06:21.144514+00:00",
+  "eda_summary": {
+    "rows": 1474,
+    "columns": 13,
+    "missing_values_total": 0,
+    "target_min": 0.0,
+    "target_max": 1.0,
+    "target_mean": 0.6745624151967436
+  }
+}
